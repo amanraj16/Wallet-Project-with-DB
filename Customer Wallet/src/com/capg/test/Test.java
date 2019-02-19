@@ -1,20 +1,22 @@
 package com.capg.test;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import com.capg.beans.Customer;
+import com.capg.exceptions.MobileNumberDoesNotExist;
 import com.capg.exceptions.MobileNumberIsAlreadyRegistered;
 import com.capg.service.WalletServiceImpl;
 
 public class Test {
 	private static Scanner scanner=new Scanner(System.in);
 	private static WalletServiceImpl walletServiceImpl=new WalletServiceImpl();
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, MobileNumberDoesNotExist, SQLException {
 		showMenu();
 	}
-	public static  void showMenu()
+	public static  void showMenu() throws ClassNotFoundException, MobileNumberDoesNotExist, SQLException
 	{
 		int choice;
 		while(true)
@@ -36,13 +38,73 @@ public class Test {
 				   break;
 			case 3:fundTransfer();
 				   break;
-			/*case 4:withdrawAmount();
+			case 4:withdrawAmount();
 				   break;
 			case 5:depositAmount();
-			 	   break;*/
+			 	   break;
 			case 6:System.exit(0);
 			default:System.out.println("Wrong Choice Is Entered");
 			}
+		}
+	}
+	private static void depositAmount() {
+		System.out.println("Please Enter Your Mobile Number");
+		String mobileNo=scanner.next();
+		int len=mobileNo.length();
+		if(len!=10)
+		{
+			System.out.println("Please Enter 10 digit Mobile Number");
+			depositAmount();
+		}
+		else if(Pattern.matches("[6789]{1}[0-9]{9}",mobileNo)==false)
+			{
+			System.out.println("This mobile number is not valid");
+			depositAmount();
+			}
+		try {
+			Customer customer=walletServiceImpl.searchMobileNumber(mobileNo);
+		}catch(Exception e)
+		{
+			System.out.println("***"+e.getMessage()+"***"+"\n\n");
+		}
+		System.out.println("Enter Amount to deposit");
+		BigDecimal amount=scanner.nextBigDecimal();
+		try {
+			Customer customer=walletServiceImpl.depositAmount(mobileNo, amount);
+			System.out.println("Transaction Successfull. Updated Balance--> "+customer.getWallet().getBalance()+"\n\n");
+		}catch(Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	private static void withdrawAmount() {
+		System.out.println("Please Enter Your Mobile Number");
+		String mobileNo=scanner.next();
+		int len=mobileNo.length();
+		if(len!=10)
+		{
+			System.out.println("Please Enter 10 digit Mobile Number");
+			withdrawAmount();
+		}
+		else if(Pattern.matches("[6789]{1}[0-9]{9}",mobileNo)==false)
+			{
+			System.out.println("This mobile number is not valid");
+			withdrawAmount();
+			}
+		try {
+			Customer customer=walletServiceImpl.searchMobileNumber(mobileNo);
+		}catch(Exception e)
+		{
+			System.out.println("***"+e.getMessage()+"***"+"\n\n");
+		}
+		System.out.println("Enter Amount to withdraw");
+		BigDecimal amount=scanner.nextBigDecimal();
+		try {
+			Customer customer=walletServiceImpl.withdrawAmount(mobileNo, amount);
+			System.out.println("Transaction Successfull. Remaining Balance--> "+customer.getWallet().getBalance()+"\n\n");
+		}catch(Exception e)
+		{
+			System.out.println(e.getMessage());
 		}
 	}
 	private static void fundTransfer() {
@@ -96,7 +158,7 @@ public class Test {
 			System.out.println("***"+e.getMessage()+"***"+"\n\n");
 		}
 	}
-	public static void createAccount()
+	public static void createAccount() throws ClassNotFoundException, MobileNumberDoesNotExist, SQLException
 	{
 		System.out.println("Please Enter Your Name");
 		String name=scanner.next();
@@ -130,8 +192,9 @@ public class Test {
 					System.out.println("***"+e.getMessage()+"***"+"\n\n");
 				}
 	}
-}
-	public static void showBalance()
+	}
+
+	public static void showBalance() throws ClassNotFoundException, MobileNumberDoesNotExist, SQLException
 	{
 		System.out.println("Enter Mobile Number");
 		String mobileno=scanner.next();

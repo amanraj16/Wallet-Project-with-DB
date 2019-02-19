@@ -79,9 +79,7 @@ public class WalletServiceImpl implements WalletService {
 		Customer customer=walletRepo.findOne(mobileNo);
 		if(customer!=null)
 		{
-			Wallet wallet=new Wallet();
-			wallet.setBalance(customer.getWallet().getBalance().add(amount));
-			return customer;
+			return walletRepo.depositAmount(mobileNo, amount);
 		}
 		else 
 			throw new MobileNumberDoesNotExist("This Mobile Number Does Not Exist");
@@ -95,8 +93,8 @@ public class WalletServiceImpl implements WalletService {
 			Wallet wallet=new Wallet();
 			if(customer.getWallet().getBalance().compareTo(amount)>=0)
 			{
-				wallet.setBalance(customer.getWallet().getBalance().subtract(amount));
-				return customer;
+				
+				return walletRepo.withdrawAmount(mobileNo, amount);
 			}
 			else
 				throw new InsufficientBalance("Remaining Balance cannot be 0...Insufficient Balance");

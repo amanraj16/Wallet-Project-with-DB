@@ -64,5 +64,23 @@ public class WalletRepoImpl implements WalletRepo {
 		pstmt1.executeUpdate();
 		return findOne(sMobileNo);
 	}
+	public Customer withdrawAmount(String mobileno,BigDecimal amount) throws ClassNotFoundException, SQLException
+	{
+		Connection connection=establishConnection.getConnection();
+		PreparedStatement pstmt=connection.prepareStatement("update customer set wallet=? where mobileno=?");
+		pstmt.setInt(1,findOne(mobileno).getWallet().getBalance().subtract(amount).intValue());
+		pstmt.setString(2,mobileno);
+		pstmt.executeUpdate();
+		return findOne(mobileno);
+	}
+	public Customer depositAmount(String mobileno,BigDecimal amount) throws ClassNotFoundException, SQLException
+	{
+		Connection connection=establishConnection.getConnection();
+		PreparedStatement pstmt=connection.prepareStatement("update customer set wallet=? where mobileno=?");
+		pstmt.setInt(1,findOne(mobileno).getWallet().getBalance().add(amount).intValue());
+		pstmt.setString(2,mobileno);
+		pstmt.executeUpdate();
+		return findOne(mobileno);
+	}
 
 }
